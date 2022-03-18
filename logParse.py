@@ -9,7 +9,7 @@
 # options needed: -i (--ipv4, Print lines that contain an IPv4 address, matching IPs are highlighted)
 # options needed: -I (--ipv6, Print lines that contain an IPv6 address, std notation, matching IPs are highlighted)
 # If FILE is omitted, standard input is used instead
-# Usage: ./util.py [OPTION]... [FILE]
+# Usage: ./logParse.py [OPTION]... [FILE]
 
 from sys import argv
 import re
@@ -36,12 +36,20 @@ with open(filename, 'r') as fp:
 print('Total Lines', count + 1)
 
 
+# a loop for all the options the user has
+
 for i in range(0, totalArgs-2):
 
     # first lines option
     if optionList[i] == '-f' or optionList[i] == '--first':
         txt = open(filename)
-        numLines = optionList[i+1]
+        try:
+            if int(optionList[i+1]) >= 0 or int(optionList[i+1]) <= count:
+                numLines = optionList[i+1]
+            else:
+                numLines = 0
+        except IndexError:
+            numLines = 0
         print("These are the first", int(numLines), "lines from the file: ")
         lines = txt.readlines()
         for j in range(0, int(numLines)):
@@ -51,7 +59,13 @@ for i in range(0, totalArgs-2):
     # last lines option
     if optionList[i] == '-l' or optionList[i] == '--last':
         txt = open(filename)
-        numLines = optionList[i+1]
+        try:
+            if int(optionList[i+1]) >= 0 or int(optionList[i+1]) <= count:
+                numLines = optionList[i+1]
+            else:
+                numLines = 0
+        except IndexError:
+            numLines = 0
         print("These are the last", int(numLines), "lines from the file: ")
         lines = txt.readlines()
         startHere = (count+1)-int(numLines)
