@@ -50,6 +50,8 @@ for i in range(0, totalArgs-2):
                 numLines = 0
         except IndexError:
             numLines = 0
+        except ValueError:
+            numLines = 0
         print("These are the first", int(numLines), "lines from the file: ")
         lines = txt.readlines()
         for j in range(0, int(numLines)):
@@ -65,6 +67,8 @@ for i in range(0, totalArgs-2):
             else:
                 numLines = 0
         except IndexError:
+            numLines = 0
+        except ValueError:
             numLines = 0
         print("These are the last", int(numLines), "lines from the file: ")
         lines = txt.readlines()
