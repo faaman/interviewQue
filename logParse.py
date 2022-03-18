@@ -2,6 +2,7 @@
 # A test suite must be included
 # hij: use regex module
 # do not use the 'head', 'tail' or 'grep' utilities
+# Usage: ./logParse.py [OPTION]... [FILE]
 # options needed: -h
 # options needed: -f (--first NUM, Print first NUM lines) - if this is chosen, NUM is mandatory?
 # options needed: -l (--last NUM, Print last NUM lines)
@@ -9,7 +10,7 @@
 # options needed: -i (--ipv4, Print lines that contain an IPv4 address, matching IPs are highlighted)
 # options needed: -I (--ipv6, Print lines that contain an IPv6 address, std notation, matching IPs are highlighted)
 # If FILE is omitted, standard input is used instead
-# Usage: ./logParse.py [OPTION]... [FILE]
+
 
 from sys import argv
 import re
@@ -32,15 +33,24 @@ filename = argv[totalArgs - 1]
 ########################
 
 # find out total number of lines in file
-with open(filename, 'r') as fp:
-    for count, line in enumerate(fp):
-        pass
-print('Total Lines', count + 1)
-
+try:
+    with open(filename, 'r') as fp:
+        for count, line in enumerate(fp):
+            pass
+    print('Total Lines', count + 1)
+except FileNotFoundError:
+    print("There is no valid file mentioned.")
+    exit()
 
 # a loop for all the options the user has
 
 for i in range(0, totalArgs-2):
+
+    # help option - a bit of a duct tape approach
+    if optionList[i] == '-h' or optionList[i] == '--help':
+        helpTxt = open("/home/fati/PycharmProjects/pythonTau/venv/redHatQue/help.txt")
+        print(helpTxt.read())
+        helpTxt.close()
 
     # first lines option
     if optionList[i] == '-f' or optionList[i] == '--first':
