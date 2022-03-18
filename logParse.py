@@ -13,6 +13,8 @@
 
 from sys import argv
 import re
+import datetime
+import decimal
 
 totalArgs = len(argv)
 numLines = 0
@@ -82,13 +84,29 @@ for i in range(0, totalArgs-2):
         txt = open(filename)
         print("These are the lines from the file that contain timestamps: ")
         lines = txt.readlines()
-        print(count)
         for m in range(0, count):
             #if re.match('\d{2}:\d{2}:\d{2}', lines[i]):
             # The previous line has the limitation that it only shows true if the timestamp is at the beginning of line
             if re.search('\d{2}:\d{2}:\d{2}', lines[m]):
-                print("At line: %i" % m)
-                print(lines[m])
+                try:
+                    myDate = re.findall('\d{2}:\d{2}:\d{2}', lines[m])
+                    strDate = str(myDate)
+
+                    splitTime = strDate.split(':')
+                    tempHr = re.findall('\d{2}', splitTime[0])
+                    tempMi = re.findall('\d{2}', splitTime[1])
+                    tempSe = re.findall('\d{2}', splitTime[2])
+
+                    if (int(tempHr[0])) >= 0 and (int(tempHr[0])) <= 24:
+                        if (int(tempMi[0])) >= 0 and (int(tempMi[0])) <= 59:
+                            if (int(tempSe[0])) >= 0 and (int(tempSe[0])) <= 59:
+                                print("At line: %i" % m)
+                                print(lines[m])
+
+                except ValueError:
+                    pass
+                except IndexError:
+                    pass
         txt.close()
 
 
