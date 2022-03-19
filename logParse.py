@@ -17,7 +17,6 @@
 from sys import argv
 import re
 import datetime
-#import decimal
 
 totalArgs = len(argv)
 numLines = 0
