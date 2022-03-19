@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # A Python CLI application that will parse logs of various kinds
 # A test suite must be included
 # hij: use regex module
