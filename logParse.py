@@ -1,167 +1,134 @@
 #!/usr/bin/python3
 
+# current issues: cat log file, filename imperfections, check std ip
 # A Python CLI application that will parse logs of various kinds
 # A test suite must be included
-# hij: use regex module
 # do not use the 'head', 'tail' or 'grep' utilities
 # Usage: ./logParse.py [OPTION]... [FILE]
-# options needed: -h
-# options needed: -f (--first NUM, Print first NUM lines) - if this is chosen, NUM is mandatory?
-# options needed: -l (--last NUM, Print last NUM lines)
-# options needed: -t (--timestamps, Print lines that contain a timestamp in HH:MM:SS format)
-# options needed: -i (--ipv4, Print lines that contain an IPv4 address, matching IPs are highlighted)
-# options needed: -I (--ipv6, Print lines that contain an IPv6 address, std notation, matching IPs are highlighted)
 # If FILE is omitted, standard input is used instead
 
-
-from sys import argv
+import argparse
 import re
 import datetime
 
-totalArgs = len(argv)
-numLines = 0
-optionList = []
-count = 0
-script = argv[0]
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--first', nargs=1, default=0, help="Print first NUM lines")
+parser.add_argument('-l', '--last', nargs=1, default=0, help="Print last NUM lines")
+parser.add_argument('-t', '--timestamps', action='store_true', help="Print lines that contain a timestamp in HH:MM:SS format")
+parser.add_argument('-i', '--ipv4', action='store_true', help="Print lines that contain an IPv4 address, matching IPs are highlighted")
+parser.add_argument('-I', '--ipv6', action='store_true', help="Print lines that contain an IPv6 address, std notation, matching IPs are highlighted")
+parser.add_argument('--filename', help="Input a filename")
+parser.parse_args()
 
-i = 1
-for k in range(0, totalArgs - 2):
-    optionList.append(argv[i])
-    i = i+1
-
-########################
 
 # find out total number of lines in file, if file does not exist, get standard input from user
-def catchingNoFiles():
+def catching_no_files():
     try:
-        filename = argv[totalArgs - 1]
-        with open(filename, 'r') as fp:
-            for count, line in enumerate(fp):
+        found_file = parser.parse_args().filename
+        with open(found_file, 'r') as fp:
+            for count_file_lines, line in enumerate(fp):
                 pass
-        print('Total Lines', count + 1)
-        return filename, count
+        print('Total Lines', count_file_lines + 1)
+        return found_file, count_file_lines
     except FileNotFoundError:
         print("There is no valid file mentioned.")
-        linesCmd = input("How many lines of text would you like to input? ")
+        lines_cmd = input("How many lines of text would you like to input? ")
         target = open('standardIpText.txt', 'w')
         line1 = input("Input line: ")
         target.write(line1)
-        for li in range(1, int(linesCmd)):
+        for li in range(1, int(lines_cmd)):
             line1 = input("Input line: ")
             target.write("\n")
             target.write(line1)
         target.close()
-        count = int(linesCmd) - 1
-        filename = 'standardIpText.txt'
-        print('Total Lines', int(count) + 1)
-        return filename, count
+        count_std_lines = int(lines_cmd) - 1
+        new_file = 'standardIpText.txt'
+        print('Total Lines', int(count_std_lines) + 1)
+        return new_file, count_std_lines
 
 
-# a loop for all the options the user has
+if parser.parse_args().first != 0:
+    filename, count = catching_no_files()
+    txt = open(filename)
+    numLines = int(parser.parse_args().first[0])
+    if int(count) < numLines:
+        numLines = count + 1
+        print("There are only", numLines, "lines in the file, and so.. ")
+    print("These are the first", int(numLines), "lines from the file: ")
+    lines = txt.readlines()
+    for j in range(0, int(numLines)):
+        print(lines[j])
+    txt.close()
 
-for i in range(0, totalArgs-2):
 
-    # help option - a bit of a duct tape approach
-    if optionList[i] == '-h' or optionList[i] == '--help':
-        helpTxt = open("/home/fati/PycharmProjects/pythonTau/venv/redHatQue/help.txt")
-        print(helpTxt.read())
-        helpTxt.close()
+if parser.parse_args().last != 0:
+    filename, count = catching_no_files()
+    txt = open(filename)
+    numLines = int(parser.parse_args().last[0])
+    if int(count) < numLines:
+        startHere = 0
+    else:
+        startHere = int(count) + 1 - int(numLines)
+    print("These are the last", int(numLines), "lines from the file: ")
+    lines = txt.readlines()
+    for j in range(startHere, int(count) + 1):
+        print(lines[j])
+    txt.close()
 
-    # first lines option
-    if optionList[i] == '-f' or optionList[i] == '--first':
-        filename, count = catchingNoFiles()
-        txt = open(filename)
-        # the below is an abrupt ending
-        if int(count) < int(optionList[i+1]):
-            exit()
-        try:
-            if int(optionList[i+1]) >= 0 or int(optionList[i+1]) <= count:
-                numLines = optionList[i+1]
-            else:
-                numLines = 0
-        except IndexError:
-            numLines = 0
-        except ValueError:
-            numLines = 0
-        print("These are the first", int(numLines), "lines from the file: ")
-        lines = txt.readlines()
-        for j in range(0, int(numLines)):
+
+if parser.parse_args().timestamps != 0:
+    filename, count = catching_no_files()
+    txt = open(filename)
+
+    print("These are the lines from the file that contain timestamps: ")
+    lines = txt.readlines()
+    for m in range(0, int(count) + 1):
+        if re.search('\d{2}:\d{2}:\d{2}', lines[m]):
+            try:
+                myDate = re.findall('\d{2}:\d{2}:\d{2}', lines[m])
+                strDate = str(myDate)
+
+                splitTime = strDate.split(':')
+                tempHr = re.findall('\d{2}', splitTime[0])
+                tempMi = re.findall('\d{2}', splitTime[1])
+                tempSe = re.findall('\d{2}', splitTime[2])
+
+                if (int(tempHr[0])) >= 0 and (int(tempHr[0])) <= 24:
+                    if (int(tempMi[0])) >= 0 and (int(tempMi[0])) <= 59:
+                        if (int(tempSe[0])) >= 0 and (int(tempSe[0])) <= 59:
+                            print("At line: ", m + 1)
+                            print(lines[m])
+
+            except ValueError:
+                pass
+            except IndexError:
+                pass
+    txt.close()
+
+
+if parser.parse_args().ipv4 != 0:
+    filename, count = catching_no_files()
+    txt = open(filename)
+
+    print("These are the lines from the file that contain an IPv4 address: ")
+    lines = txt.readlines()
+    pattern = r"((([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])[ (\[]?(\.|dot)[ )\]]?){3}([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))"
+    for j in range(0, int(count)+1):
+        if re.search(pattern, lines[j]):
+            print("At line: ", j+1)
             print(lines[j])
-        txt.close()
+    txt.close()
 
-    # last lines option
-    if optionList[i] == '-l' or optionList[i] == '--last':
-        filename, count = catchingNoFiles()
-        txt = open(filename)
-        # the below is an abrupt ending
-        if int(count) < int(optionList[i+1]):
-            exit()
-        try:
-            if int(optionList[i+1]) >= 0 or int(optionList[i+1]) <= count:
-                numLines = optionList[i+1]
-            else:
-                numLines = 0
-        except IndexError:
-            numLines = 0
-        except ValueError:
-            numLines = 0
-        print("These are the last", int(numLines), "lines from the file: ")
-        lines = txt.readlines()
-        startHere = int(count)+1 - int(numLines)
-        for j in range(startHere, int(count)+1):
+
+if parser.parse_args().ipv6 != 0:
+    filename, count = catching_no_files()
+    txt = open(filename)
+
+    print("These are the lines from the file that contain an IPv6 address: ")
+    lines = txt.readlines()
+    pattern = r"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}| ([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:) {1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"
+    for j in range(0, int(count) + 1):
+        if re.search(pattern, lines[j]):
+            print("At line: ", j + 1)
             print(lines[j])
-        txt.close()
-
-    # find all timestamps
-    if optionList[i] == '-t' or optionList[i] == '--timestamps':
-        filename, count = catchingNoFiles()
-        txt = open(filename)
-        print("These are the lines from the file that contain timestamps: ")
-        lines = txt.readlines()
-        for m in range(0, int(count)+1):
-            if re.search('\d{2}:\d{2}:\d{2}', lines[m]):
-                try:
-                    myDate = re.findall('\d{2}:\d{2}:\d{2}', lines[m])
-                    strDate = str(myDate)
-
-                    splitTime = strDate.split(':')
-                    tempHr = re.findall('\d{2}', splitTime[0])
-                    tempMi = re.findall('\d{2}', splitTime[1])
-                    tempSe = re.findall('\d{2}', splitTime[2])
-
-                    if (int(tempHr[0])) >= 0 and (int(tempHr[0])) <= 24:
-                        if (int(tempMi[0])) >= 0 and (int(tempMi[0])) <= 59:
-                            if (int(tempSe[0])) >= 0 and (int(tempSe[0])) <= 59:
-                                print("At line: ", m+1)
-                                print(lines[m])
-
-                except ValueError:
-                    pass
-                except IndexError:
-                    pass
-        txt.close()
-
-
-    if optionList[i] == '-i' or optionList[i] == '--ipv4':
-        filename, count = catchingNoFiles()
-        txt = open(filename)
-        print("These are the lines from the file that contain an IPv4 address: ")
-        lines = txt.readlines()
-        pattern = r"((([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])[ (\[]?(\.|dot)[ )\]]?){3}([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))"
-        for j in range(0, int(count)+1):
-            if re.search(pattern, lines[j]):
-                print("At line: ", j+1)
-                print(lines[j])
-        txt.close()
-
-    if optionList[i] == '-I' or optionList[i] == '--ipv6':
-        filename, count = catchingNoFiles()
-        txt = open(filename)
-        print("These are the lines from the file that contain an IPv6 address: ")
-        lines = txt.readlines()
-        pattern = r"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}| ([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:) {1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"
-        for j in range(0, int(count)+1):
-            if re.search(pattern, lines[j]):
-                print("At line: ", j+1)
-                print(lines[j])
-        txt.close()
+    txt.close()

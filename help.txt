@@ -1,8 +1,0 @@
-# This is a Python CLI application that will parse logs of various kinds
-# Usage: ./logParse.py [OPTION]... [FILE]
-# option: -h (--help, Print help)
-# option: -f (--first NUM, Print first NUM lines)
-# option: -l (--last NUM, Print last NUM lines)
-# option: -t (--timestamps, Print lines that contain a timestamp in HH:MM:SS format)
-# option: -i (--ipv4, Print lines that contain an IPv4 address, matching IPs are highlighted)
-# option: -I (--ipv6, Print lines that contain an IPv6 address, std notation, matching IPs are highlighted)
