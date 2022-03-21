@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# current issues: cat log file, filename imperfections, check std ip
+# current issues: cat log file, cat test_0.log | ./util.py --first 10
 # A Python CLI application that will parse logs of various kinds
 # A test suite must be included
 # do not use the 'head', 'tail' or 'grep' utilities
@@ -11,13 +11,13 @@ import argparse
 import re
 import datetime
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='A Python CLI application that will parse logs of various kinds')
 parser.add_argument('-f', '--first', nargs=1, default=0, help="Print first NUM lines")
 parser.add_argument('-l', '--last', nargs=1, default=0, help="Print last NUM lines")
 parser.add_argument('-t', '--timestamps', action='store_true', help="Print lines that contain a timestamp in HH:MM:SS format")
 parser.add_argument('-i', '--ipv4', action='store_true', help="Print lines that contain an IPv4 address, matching IPs are highlighted")
 parser.add_argument('-I', '--ipv6', action='store_true', help="Print lines that contain an IPv6 address, std notation, matching IPs are highlighted")
-parser.add_argument('--filename', help="Input a filename")
+parser.add_argument('--filename', help="Input a filename. If FILE is omitted, standard input is used")
 parser.parse_args()
 
 
@@ -30,21 +30,26 @@ def catching_no_files():
                 pass
         print('Total Lines', count_file_lines + 1)
         return found_file, count_file_lines
-    except FileNotFoundError:
-        print("There is no valid file mentioned.")
+    except TypeError:
+        print("There is no valid file mentioned, standard input will be used instead.")
+        print("Note: If multiple options are chosen, user will be asked to input text individually for each option.")
         lines_cmd = input("How many lines of text would you like to input? ")
         target = open('standardIpText.txt', 'w')
         line1 = input("Input line: ")
         target.write(line1)
-        for li in range(1, int(lines_cmd)):
-            line1 = input("Input line: ")
-            target.write("\n")
-            target.write(line1)
-        target.close()
-        count_std_lines = int(lines_cmd) - 1
-        new_file = 'standardIpText.txt'
-        print('Total Lines', int(count_std_lines) + 1)
-        return new_file, count_std_lines
+        try:
+            for li in range(1, int(lines_cmd)):
+                line1 = input("Input line: ")
+                target.write("\n")
+                target.write(line1)
+            target.close()
+            count_std_lines = int(lines_cmd) - 1
+            new_file = 'standardIpText.txt'
+            print('Total Lines', int(count_std_lines) + 1)
+            return new_file, count_std_lines
+        except ValueError:
+            print("Not a valid range, program exiting.")
+            exit()
 
 
 if parser.parse_args().first != 0:
