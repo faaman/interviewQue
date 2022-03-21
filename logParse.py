@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 # current issues: cat log file -> cat test_0.log | ./util.py --first 10
-# A test suite must be included
 # do not use the 'head', 'tail' or 'grep' utilities
 
 import sys
