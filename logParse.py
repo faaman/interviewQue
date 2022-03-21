@@ -132,7 +132,7 @@ def main():
         numLines = int(parser.parse_args().first[0])
         if int(countlines) < numLines:
             numLines = countlines + 1
-            print("There are only", numLines, "lines in the file, and so.. ")
+            print("There are only", int(countlines) + 1, "lines in the file, and so.. ")
         first_lines(goodfile, countlines, numLines)
 
     if parser.parse_args().last != 0:
