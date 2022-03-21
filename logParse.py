@@ -1,28 +1,17 @@
 #!/usr/bin/python3
 
-# current issues: cat log file, cat test_0.log | ./util.py --first 10
-# A Python CLI application that will parse logs of various kinds
+# current issues: cat log file -> cat test_0.log | ./util.py --first 10
 # A test suite must be included
 # do not use the 'head', 'tail' or 'grep' utilities
-# Usage: ./logParse.py [OPTION]... [FILE]
-# If FILE is omitted, standard input is used instead
 
+import sys
 import argparse
 import re
-import datetime
-
-parser = argparse.ArgumentParser(description='A Python CLI application that will parse logs of various kinds')
-parser.add_argument('-f', '--first', nargs=1, default=0, help="Print first NUM lines")
-parser.add_argument('-l', '--last', nargs=1, default=0, help="Print last NUM lines")
-parser.add_argument('-t', '--timestamps', action='store_true', help="Print lines that contain a timestamp in HH:MM:SS format")
-parser.add_argument('-i', '--ipv4', action='store_true', help="Print lines that contain an IPv4 address, matching IPs are highlighted")
-parser.add_argument('-I', '--ipv6', action='store_true', help="Print lines that contain an IPv6 address, std notation, matching IPs are highlighted")
-parser.add_argument('--filename', help="Input a filename. If FILE is omitted, standard input is used")
-parser.parse_args()
+# import datetime (this could have been used)
 
 
 # find out total number of lines in file, if file does not exist, get standard input from user
-def catching_no_files():
+def catching_no_files(parser):
     try:
         found_file = parser.parse_args().filename
         with open(found_file, 'r') as fp:
@@ -52,13 +41,8 @@ def catching_no_files():
             exit()
 
 
-if parser.parse_args().first != 0:
-    filename, count = catching_no_files()
+def first_lines(filename, count, numLines):
     txt = open(filename)
-    numLines = int(parser.parse_args().first[0])
-    if int(count) < numLines:
-        numLines = count + 1
-        print("There are only", numLines, "lines in the file, and so.. ")
     print("These are the first", int(numLines), "lines from the file: ")
     lines = txt.readlines()
     for j in range(0, int(numLines)):
@@ -66,14 +50,8 @@ if parser.parse_args().first != 0:
     txt.close()
 
 
-if parser.parse_args().last != 0:
-    filename, count = catching_no_files()
+def last_lines(filename, count, numLines, startHere):
     txt = open(filename)
-    numLines = int(parser.parse_args().last[0])
-    if int(count) < numLines:
-        startHere = 0
-    else:
-        startHere = int(count) + 1 - int(numLines)
     print("These are the last", int(numLines), "lines from the file: ")
     lines = txt.readlines()
     for j in range(startHere, int(count) + 1):
@@ -81,8 +59,7 @@ if parser.parse_args().last != 0:
     txt.close()
 
 
-if parser.parse_args().timestamps != 0:
-    filename, count = catching_no_files()
+def find_timestamps(filename, count):
     txt = open(filename)
 
     print("These are the lines from the file that contain timestamps: ")
@@ -111,10 +88,8 @@ if parser.parse_args().timestamps != 0:
     txt.close()
 
 
-if parser.parse_args().ipv4 != 0:
-    filename, count = catching_no_files()
+def find_ipv4(filename, count):
     txt = open(filename)
-
     print("These are the lines from the file that contain an IPv4 address: ")
     lines = txt.readlines()
     pattern = r"((([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])[ (\[]?(\.|dot)[ )\]]?){3}([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5]))"
@@ -125,10 +100,8 @@ if parser.parse_args().ipv4 != 0:
     txt.close()
 
 
-if parser.parse_args().ipv6 != 0:
-    filename, count = catching_no_files()
+def find_ipv6(filename, count):
     txt = open(filename)
-
     print("These are the lines from the file that contain an IPv6 address: ")
     lines = txt.readlines()
     pattern = r"(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}| ([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:) {1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))"
@@ -137,3 +110,48 @@ if parser.parse_args().ipv6 != 0:
             print("At line: ", j + 1)
             print(lines[j])
     txt.close()
+
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description='A Python CLI application that will parse logs of various kinds')
+    parser.add_argument('-f', '--first', nargs=1, default=0, help="Print first NUM lines")
+    parser.add_argument('-l', '--last', nargs=1, default=0, help="Print last NUM lines")
+    parser.add_argument('-t', '--timestamps', action='store_true',
+                        help="Print lines that contain a timestamp in HH:MM:SS format")
+    parser.add_argument('-i', '--ipv4', action='store_true',
+                        help="Print lines that contain an IPv4 address, matching IPs are highlighted")
+    parser.add_argument('-I', '--ipv6', action='store_true',
+                        help="Print lines that contain an IPv6 address, std notation, matching IPs are highlighted")
+    parser.add_argument('--filename', help="Input a filename. If FILE is omitted, standard input is used")
+    parser.parse_args()
+
+    goodfile, countlines = catching_no_files(parser)
+
+    if parser.parse_args().first != 0:
+        numLines = int(parser.parse_args().first[0])
+        if int(countlines) < numLines:
+            numLines = countlines + 1
+            print("There are only", numLines, "lines in the file, and so.. ")
+        first_lines(goodfile, countlines, numLines)
+
+    if parser.parse_args().last != 0:
+        numLines = int(parser.parse_args().last[0])
+        if int(countlines) < numLines:
+            startHere = 0
+        else:
+            startHere = int(countlines) + 1 - int(numLines)
+        last_lines(goodfile, countlines, numLines, startHere)
+
+    if parser.parse_args().timestamps != 0:
+        find_timestamps(goodfile, countlines)
+
+    if parser.parse_args().ipv4 != 0:
+        find_ipv4(goodfile, countlines)
+
+    if parser.parse_args().ipv6 != 0:
+        find_ipv6(goodfile, countlines)
+
+
+if __name__ == '__main__':
+    sys.exit(main())
