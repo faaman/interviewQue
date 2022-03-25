@@ -1,12 +1,3 @@
 # interviewQue
 
-## Add a shebang line to execute at bash:
-* Include #!/usr/bin/python3 at the top of the script
-* Then chmod +x logParse.py
-
-## General info
-This project is a Python CLI application that will parse logs of various kinds.
-	
-## Technologies
-Project is created with:
-* Python: 3.9.5
+## Use the trunk branch to check out the code
