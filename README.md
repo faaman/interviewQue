@@ -14,3 +14,6 @@ Project is created with:
 ## What is all the stuff I learnt while completing this project:
 
 * Creating the readme file on Github - see [this](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) for more details
+* Object oriented programming in Python - ended up here to actually write tests for the program
+* Used argparse for easier command line processing
+* Used unittest for unit testing!
