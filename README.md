@@ -1,5 +1,12 @@
 # interviewQue
 
-logParse.py is the main program.\n
-files starting with name text.. are the log files used for input data.
-files starting with name test_ contain tests.
+## Add a shebang line to execute at bash:
+* Include #!/usr/bin/python3 at the top of the script
+* Then chmod +x logParse.py
+
+## General info
+This project is a Python CLI application that will parse logs of various kinds.
+	
+## Technologies
+Project is created with:
+* Python: 3.9.5
