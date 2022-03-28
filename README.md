@@ -1,4 +1,4 @@
-# interviewQue
+# Adding functionality while using the Head First Python book
 
 ## Add a shebang line to execute at bash:
 * Include #!/usr/bin/python3 at the top of the script
