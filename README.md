@@ -14,7 +14,7 @@ Project is created with:
 ## What is all the stuff I learnt while completing this project:
 
 1. Built-in DS: 
-..* List (like an array in Java) - mutable - ordered
++ List (like an array in Java) - mutable - ordered
 + Tuple - immutable list - ordered
 + Dictionary  - muatable - unordered
 + Set - mutable - unordered - set of unique objects
