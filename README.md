@@ -21,4 +21,5 @@ Project is created with:
 
 2. Dictionary
 + The key is usually a string, value can by any Python object
-+ 
++ Insertion order is not maintained
+
