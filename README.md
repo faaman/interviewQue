@@ -5,7 +5,7 @@
 * Then chmod +x logParse.py
 
 ## General info
-This project is a Python CLI application that will parse logs of various kinds.
+This project is a collection of code written while learning from the book above.
 	
 ## Technologies
 Project is created with:
@@ -13,7 +13,13 @@ Project is created with:
 
 ## What is all the stuff I learnt while completing this project:
 
-* Creating the readme file on Github - see [this](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) for more details
-* Object oriented programming in Python - ended up here to actually write tests for the program
-* Used argparse for easier command line processing
-* Used unittest for unit testing!
+1. Built-in DS: 
++ List (like an array in Java) - mutable - ordered
++ Tuple - immutable list - ordered
++ Dictionary  - muatable - unordered
++ Set - mutable - unordered - set of unique objects
+
+2. Dictionary
++ The key is usually a string, value can by any Python object
++ Insertion order is not maintained
+
