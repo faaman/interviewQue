@@ -18,3 +18,7 @@ Project is created with:
 + Tuple - immutable list - ordered
 + Dictionary  - muatable - unordered
 + Set - mutable - unordered - set of unique objects
+
+2. Dictionary
++ The key is usually a string, value can by any Python object
++ 
